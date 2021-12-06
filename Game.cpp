@@ -1,4 +1,5 @@
 #include "Game.h"
+
 //private funcitons
 void Game::initializeVariables()
 {
@@ -53,8 +54,8 @@ void Game::createEnemies()
 	//create new astroids
 	static short int spawnTimer = 80;
 	if (spawnTimer > 80) {
-		float randomSpawnX = rand() % this->window->getSize().x;
-		float randomSpawnY = rand() % this->window->getSize().y;
+		float randomSpawnX = (rand() % 100) * -1.f;
+		float randomSpawnY = (rand() % 100) * -1.f;
 		
 		astroid.setPosition(sf::Vector2f(randomSpawnX, randomSpawnY));
 		astroids.push_back(sf::Sprite(astroid));
@@ -115,7 +116,19 @@ void Game::render()
 	
 	createEnemies();
 	for (size_t i = 0; i < astroids.size(); i++) {
-		astroids[i].move(5.f, 0);
+		//find the slope
+		float currentLocation[2] = { this->astroids[i].getGlobalBounds().height, this->astroids[i].getGlobalBounds().width };
+		float slopeY = this->window->getSize().y - currentLocation[0];
+		float slopeX = this->window->getSize().x - currentLocation[1];
+		float slope = slopeY / slopeX;
+		std::cout << currentLocation[1] << "x, " << currentLocation[0] << "y" << std::endl;
+		std::cout << slope << std::endl;
+		
+		//find next point on line
+		//curent location 1 is the x cord, loaction 0 is y
+		float nextY = (slope * ((currentLocation[1] - 5.f) - currentLocation[1])) - currentLocation[0];
+		std::cout << nextY << "next y" << std::endl;
+		astroids[i].move(5.f, nextY);
 		this->window->draw(this->astroids[i]);
 	}
 
