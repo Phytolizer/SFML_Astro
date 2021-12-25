@@ -11,8 +11,23 @@ void Game::initializeVariables()
 	if (!astroidTex.loadFromFile("textures/astroid.png")) {
 		throw "could not laod astroid.png";
 	}
+	if (!playerTex.loadFromFile("textures/player.png")) {
+		throw "could not laod astroid.png";
+	}
 	//set astroid texture
-	this->astroid.setTexture(astroidTex);
+	this->astroid.setTexture(this->astroidTex);
+	this->astroid.scale(0.5f, 0.5f);
+	//set player texture
+	this->player.setTexture(this->playerTex);
+	this->player.scale(0.5f, 0.5f);
+	this->player.setOrigin(this->player.getGlobalBounds().width , this->player.getGlobalBounds().height/2);
+	this->playerAngle = 0.f;
+	//player position is set in initWindow
+	//init projectiles 
+	this->projectile.setSize(sf::Vector2f(5.f,10.5f));
+	this->projectile.setFillColor(sf::Color::Red);
+	this->fireLimit = true;
+
 }
 
 void Game::initWindow()
@@ -20,9 +35,14 @@ void Game::initWindow()
 	//Game* e;
 	//e->window = new sf::RenderWindow(sf::VideoMode(900, 900), "Game 1", sf::Style::Close);
 	//cleaner verson of below
-	this->window = new sf::RenderWindow(sf::VideoMode(900, 900), "Game 1", sf::Style::Close);
-	this->window->setFramerateLimit(144);
-	
+	this->window = new sf::RenderWindow(sf::VideoMode(900, 900), "Game 1", sf::Style::Default);
+	this->window->setMouseCursorGrabbed(true);
+
+	this->window->setFramerateLimit(60);
+
+	//sets player start position
+	this->player.setPosition(this->window->getSize().x / 2 - player.getGlobalBounds().width, this->window->getSize().y / 2 - player.getGlobalBounds().height);
+
 }
 
 //constructor
@@ -30,7 +50,6 @@ Game::Game()
 {
 	this->initializeVariables();
 	this->initWindow();
-	
 }
 
 //destructor
@@ -38,6 +57,7 @@ Game::~Game()
 {
 	delete this->window;
 }
+
 
 //accessors
 
@@ -49,6 +69,97 @@ const bool Game::getWindowIsOpen()
 
 
 // public fucntions
+void Game::PlayerControl()
+{
+	//rotate to face mouse
+	/*
+	is likley causeing crashes
+	*/
+	sf::Vector2i MousePos = sf::Mouse::getPosition(*(window));
+	float angle = atan2( this->player.getPosition().y-MousePos.y, this->player.getPosition().x-MousePos.x  );
+	angle = (angle* 180.f) / 3.141f;
+	this->player.setRotation(angle-90);
+	this->playerAngle = this->player.getRotation();
+	//keyboard inputs
+   //checks for keypress and keeps position of object on screen
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && this->player.getPosition().x - this->player.getGlobalBounds().width / 2 > 0) {
+		this->player.move(-8.f, 0.f);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && this->player.getPosition().x  + this->player.getGlobalBounds().width/2 < this->window->getSize().x) {
+		this->player.move(8.f, 0.f);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && this->player.getPosition().y - this->player.getGlobalBounds().height / 2 > 0) {
+		this->player.move(0.f, -8.f);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && this->player.getPosition().y + this->player.getGlobalBounds().height/2 < this->window->getSize().y) {
+		this->player.move(0.f, 8.f);
+	}
+	//mouse inputs and fire inputs
+	/*
+	No idea why the fireLimit and fireTimer break aiming
+	*/
+	
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+		shootProjectiles(angle);
+		this->fireLimit = false;
+	}
+
+	this->window->draw(this->player);
+}
+
+void Game::shootProjectiles(const float& angle)
+{
+		this->projectile.rotate(angle);
+		this->projectile.setPosition(this->player.getPosition());
+		sf::Vector2i mousePos = sf::Mouse::getPosition(*(window));
+		sf::Vector2f playerPos = this->player.getPosition();
+		//find slope for projectile to follow 
+		float moveY = (mousePos.y - playerPos.y);
+		float moveX = (mousePos.x - playerPos.x);
+		projectieles.push_back(projectile);
+		projectielePathX.push_back(moveX);
+		projectielePathY.push_back(moveY);
+}
+
+void Game::updateProjectiles()
+{
+	
+	/*
+	
+	deleteing projectiles once left screen may be bugged
+
+	maybe idk
+	
+	*/
+	for (size_t i = 0; i < projectieles.size(); i++) {
+		if (projectieles[i].getGlobalBounds().width < 0 || projectieles[i].getGlobalBounds().width > this->window->getSize().x) {
+			projectieles.erase(projectieles.begin() + i);
+			projectielePathX.erase(projectielePathX.begin() + i);
+			projectielePathY.erase(projectielePathY.begin() + i);
+		}
+		else if(projectieles[i].getGlobalBounds().height < 0 || projectieles[i].getGlobalBounds().height > this->window->getSize().y){
+			projectieles.erase(projectieles.begin() + i);
+			projectielePathX.erase(projectielePathX.begin() + i);
+			projectielePathY.erase(projectielePathY.begin() + i);
+		}
+		else {
+		projectieles[i].move(projectielePathX[i]/20,projectielePathY[i]/20);
+		this->window->draw(projectieles[i]);
+		}
+
+		//check for colllision between the projectiles and astroids
+		for (size_t j = 0; astroids.size() > j; j++) {
+			if (projectieles[i].getGlobalBounds().intersects(astroids[j].getGlobalBounds())) {
+				projectieles.erase(projectieles.begin() + i);
+				astroids.erase(astroids.begin() + j);
+				break;//we have to break out bc it will check a projectile that no longer igists if we stay in loop
+			}
+		}
+	}
+	
+
+}
+
 void Game::createEnemies()
 {
 	//create new astroids
@@ -67,20 +178,38 @@ void Game::createEnemies()
 	}
 
 	//check for out of bounds
+	
 	for (size_t i = 0; i < astroids.size(); i++) {
-		if (astroids[i].getPosition().x > this->window->getSize().x - astroid.getGlobalBounds().width) {
+		if (astroids[i].getPosition().x -101> this->window->getSize().x - astroid.getGlobalBounds().width) {
 			astroids.erase(astroids.begin() + i);
+		}
+		else if (astroids[i].getPosition().y -101> this->window->getSize().y - astroid.getGlobalBounds().height) {
+			astroids.erase(astroids.begin() + i);
+		}
+		else if (astroids[i].getPosition().x +101< 0 - astroid.getGlobalBounds().width) {
+			astroids.erase(astroids.begin() + i);
+		}
+		else if (astroids[i].getPosition().y +101< 0 - astroid.getGlobalBounds().height) {
+			astroids.erase(astroids.begin() + i);
+		}
+	}
+	
+	//draw the astroids 
+	for (size_t i = 0; i < astroids.size(); i++) {
+		//find the slope
+		float currentLocation[2] = { this->astroids[i].getGlobalBounds().height, this->astroids[i].getGlobalBounds().width };
+		float slopeY = this->window->getSize().y / 2 - currentLocation[0];
+		float slopeX = this->window->getSize().x / 2 - currentLocation[1];
+		float slope = slopeY / slopeX;
 
-		}
-		else if (astroids[i].getPosition().y > this->window->getSize().y - astroid.getGlobalBounds().height) {
-			astroids.erase(astroids.begin() + i);
-		}
-		else if (astroids[i].getPosition().x < 0 - astroid.getGlobalBounds().width) {
-			astroids.erase(astroids.begin() + i);
-		}
-		else if (astroids[i].getPosition().y < 0 - astroid.getGlobalBounds().height) {
-			astroids.erase(astroids.begin() + i);
-		}
+
+		//find next point on line
+		//curent location 1 is the x cord, loaction 0 is y
+		float nextY = -1 * (slope * ((currentLocation[1] - 5.f) - currentLocation[1])) - currentLocation[0];
+
+		astroids[i].move(5.f, (nextY + currentLocation[1]));
+		this->window->draw(this->astroids[i]);
+
 	}
 }
 
@@ -110,27 +239,14 @@ void Game::render()
 	-clear old frame
 	-render and display new window
 	*/
-	this->window->clear(sf::Color::Red);
+	this->window->clear(sf::Color::White);
 	//draw stuff
-	//this->window->draw(this->astroid);
-	
+	//draw player
+	PlayerControl();
+	//make and draw astroids 
 	createEnemies();
-	for (size_t i = 0; i < astroids.size(); i++) {
-		//find the slope
-		float currentLocation[2] = { this->astroids[i].getGlobalBounds().height, this->astroids[i].getGlobalBounds().width };
-		float slopeY = this->window->getSize().y - currentLocation[0];
-		float slopeX = this->window->getSize().x - currentLocation[1];
-		float slope = slopeY / slopeX;
-		std::cout << currentLocation[1] << "x, " << currentLocation[0] << "y" << std::endl;
-		std::cout << slope << std::endl;
-		
-		//find next point on line
-		//curent location 1 is the x cord, loaction 0 is y
-		float nextY = (slope * ((currentLocation[1] - 5.f) - currentLocation[1])) - currentLocation[0];
-		std::cout << nextY << "next y" << std::endl;
-		astroids[i].move(5.f, nextY);
-		this->window->draw(this->astroids[i]);
-	}
+	//update projectiles
+	updateProjectiles();
 
 	this->window->display();
 }
