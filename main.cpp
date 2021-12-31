@@ -15,3 +15,4 @@ int main() {
     return 0;
 }
 	
+//pick up note fix math for astroids movement 
