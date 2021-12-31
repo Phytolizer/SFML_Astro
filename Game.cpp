@@ -246,8 +246,9 @@ void Game::render()
 	-clear old frame
 	-render and display new window
 	*/
-	this->window->clear(sf::Color::White);
+	
 	if(lose == false){
+		this->window->clear(sf::Color::White);
 		//draw stuff
 		//draw player
 		PlayerControl();
@@ -257,6 +258,7 @@ void Game::render()
 		updateProjectiles();
 	}
 	else {
+		this->window->clear(sf::Color::Red);
 		//create lose function
 	}
 	
