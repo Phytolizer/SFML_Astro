@@ -135,21 +135,21 @@ void Game::updateProjectiles()
 	
 	/*
 	
-	deleteing projectiles once left screen may be bugged
-
-	maybe idk
+	delete out of range projectiles
 	
 	*/
 	for (size_t i = 0; i < projectieles.size(); i++) {
-		if (projectieles[i].getGlobalBounds().width < 0 || projectieles[i].getGlobalBounds().width > this->window->getSize().x) {
+		if (projectieles[i].getPosition().x < 0 || projectieles[i].getPosition().x > this->window->getSize().x) {
 			projectieles.erase(projectieles.begin() + i);
 			projectielePathX.erase(projectielePathX.begin() + i);
 			projectielePathY.erase(projectielePathY.begin() + i);
+			continue;
 		}
-		else if(projectieles[i].getGlobalBounds().height < 0 || projectieles[i].getGlobalBounds().height > this->window->getSize().y){
+		else if(projectieles[i].getPosition().y < 0 || projectieles[i].getPosition().y > this->window->getSize().y){
 			projectieles.erase(projectieles.begin() + i);
 			projectielePathX.erase(projectielePathX.begin() + i);
 			projectielePathY.erase(projectielePathY.begin() + i);
+			continue;
 		}
 		else {
 		projectieles[i].move(projectielePathX[i]/20,projectielePathY[i]/20);
@@ -174,8 +174,8 @@ void Game::createEnemies()
 	//create new astroids
 	static short int spawnTimer = 80;
 	if (spawnTimer > 80) {
-		float randomSpawnX = (rand() % 100) * -1.f;
-		float randomSpawnY = (rand() % 100) * -1.f;
+		float randomSpawnX = (rand() % 900) * -1.f;
+		float randomSpawnY = (rand() % 900) * -1.f;
 		astroid.setPosition(sf::Vector2f(randomSpawnX, randomSpawnY));
 		astroids.push_back(sf::Sprite(astroid));
 		
@@ -188,16 +188,16 @@ void Game::createEnemies()
 	//check for out of bounds
 	
 	for (size_t i = 0; i < astroids.size(); i++) {
-		if (astroids[i].getPosition().x -101> this->window->getSize().x - astroid.getGlobalBounds().width) {
+		if (astroids[i].getPosition().x -901> this->window->getSize().x - astroid.getGlobalBounds().width) {
 			astroids.erase(astroids.begin() + i);
 		}
-		else if (astroids[i].getPosition().y -101> this->window->getSize().y - astroid.getGlobalBounds().height) {
+		else if (astroids[i].getPosition().y -901> this->window->getSize().y - astroid.getGlobalBounds().height) {
 			astroids.erase(astroids.begin() + i);
 		}
-		else if (astroids[i].getPosition().x +101< 0 - astroid.getGlobalBounds().width) {
+		else if (astroids[i].getPosition().x +901< 0 - astroid.getGlobalBounds().width) {
 			astroids.erase(astroids.begin() + i);
 		}
-		else if (astroids[i].getPosition().y +101< 0 - astroid.getGlobalBounds().height) {
+		else if (astroids[i].getPosition().y +901< 0 - astroid.getGlobalBounds().height) {
 			astroids.erase(astroids.begin() + i);
 		}
 	}
@@ -209,12 +209,12 @@ void Game::createEnemies()
 		float slopeY = this->window->getSize().y / 2 - currentLocation[0];
 		float slopeX = this->window->getSize().x / 2 - currentLocation[1];
 		float slope = slopeY / slopeX;
-
-		//find next point on line
+		
+		//find next point on line, point slope form
 		//curent location 1 is the x cord, loaction 0 is y
-		float nextY = -1 * (slope * ((currentLocation[1] - 5.f) - currentLocation[1])) - currentLocation[0];
-
-		astroids[i].move(5.f, (nextY + currentLocation[1]));
+		float nextY = -1 * (slope * ((currentLocation[1] - 4.f) - currentLocation[1])) + currentLocation[0];
+		
+		astroids[i].move(4.f, (nextY - currentLocation[0]));
 		this->window->draw(this->astroids[i]);
 
 	}
