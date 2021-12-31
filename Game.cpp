@@ -22,12 +22,13 @@ void Game::initializeVariables()
 	this->player.scale(0.5f, 0.5f);
 	this->player.setOrigin(this->player.getGlobalBounds().width , this->player.getGlobalBounds().height/2);
 	this->playerAngle = 0.f;
+	this->lose = false;
 	//player position is set in initWindow
 	//init projectiles 
 	this->projectile.setSize(sf::Vector2f(5.f,10.5f));
 	this->projectile.setFillColor(sf::Color::Red);
 	this->fireLimit = true;
-
+	
 }
 
 void Game::initWindow()
@@ -104,6 +105,14 @@ void Game::PlayerControl()
 		this->fireLimit = false;
 	}
 
+	//checks for inpact of player and astroid
+	for (size_t i = 0; astroids.size() > i; i++) {
+		if (astroids[i].getGlobalBounds().intersects(player.getGlobalBounds())) {
+			this->lose = true;
+			break;//we have to break out bc it will check a projectile that no longer igists if we stay in loop
+		}
+	}
+
 	this->window->draw(this->player);
 }
 
@@ -167,7 +176,6 @@ void Game::createEnemies()
 	if (spawnTimer > 80) {
 		float randomSpawnX = (rand() % 100) * -1.f;
 		float randomSpawnY = (rand() % 100) * -1.f;
-		
 		astroid.setPosition(sf::Vector2f(randomSpawnX, randomSpawnY));
 		astroids.push_back(sf::Sprite(astroid));
 		
@@ -197,11 +205,10 @@ void Game::createEnemies()
 	//draw the astroids 
 	for (size_t i = 0; i < astroids.size(); i++) {
 		//find the slope
-		float currentLocation[2] = { this->astroids[i].getGlobalBounds().height, this->astroids[i].getGlobalBounds().width };
+		float currentLocation[2] = {astroids[i].getPosition().x,astroids[i].getPosition().y};
 		float slopeY = this->window->getSize().y / 2 - currentLocation[0];
 		float slopeX = this->window->getSize().x / 2 - currentLocation[1];
 		float slope = slopeY / slopeX;
-
 
 		//find next point on line
 		//curent location 1 is the x cord, loaction 0 is y
@@ -216,15 +223,15 @@ void Game::createEnemies()
 void Game::pollEvents()
 {
 	while (this->window->pollEvent(this->ev))
-        {
-            //checks for someone clicking close button
-            if (this->ev.type == sf::Event::Closed)
-                this->window->close();
-            //checks for keyboard input
-            if (this->ev.key.code == sf::Keyboard::Escape) {
-				this->window->close();
-            }
-        }
+    {
+       //checks for someone clicking close button
+       if (this->ev.type == sf::Event::Closed)
+            this->window->close();
+       //checks for keyboard input
+       if (this->ev.key.code == sf::Keyboard::Escape) {
+			this->window->close();
+       }
+    }
 }
 
 void Game::update()
@@ -240,13 +247,20 @@ void Game::render()
 	-render and display new window
 	*/
 	this->window->clear(sf::Color::White);
-	//draw stuff
-	//draw player
-	PlayerControl();
-	//make and draw astroids 
-	createEnemies();
-	//update projectiles
-	updateProjectiles();
+	if(lose == false){
+		//draw stuff
+		//draw player
+		PlayerControl();
+		//make and draw astroids 
+		createEnemies();
+		//update projectiles
+		updateProjectiles();
+	}
+	else {
+		//create lose function
+	}
+	
+	
 
 	this->window->display();
 }

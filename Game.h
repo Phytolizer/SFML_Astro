@@ -30,6 +30,7 @@ protected:
 	//player
 	sf::Texture playerTex;
 	sf::Sprite player;
+	bool lose;
 	//projectiles
 	float playerAngle;
 	bool fireLimit;
