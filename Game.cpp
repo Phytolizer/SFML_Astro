@@ -16,10 +16,10 @@ void Game::initializeVariables()
 	}
 	//set astroid texture
 	this->astroid.setTexture(this->astroidTex);
-	this->astroid.scale(0.5f, 0.5f);
+	this->astroid.scale(0.35f, 0.35f);
 	//set player texture
 	this->player.setTexture(this->playerTex);
-	this->player.scale(0.5f, 0.5f);
+	this->player.scale(0.35f, 0.35f);
 	this->player.setOrigin(this->player.getGlobalBounds().width , this->player.getGlobalBounds().height/2);
 	this->playerAngle = 0.f;
 	this->lose = false;
@@ -173,7 +173,7 @@ void Game::createEnemies()
 {
 	//create new astroids
 	static short int spawnTimer = 80;
-	if (spawnTimer > 80) {
+	if (spawnTimer > 40) {
 		float randomSpawnX = (rand() % 900) * -1.f;
 		float randomSpawnY = (rand() % 900) * -1.f;
 		astroid.setPosition(sf::Vector2f(randomSpawnX, randomSpawnY));
@@ -206,8 +206,8 @@ void Game::createEnemies()
 	for (size_t i = 0; i < astroids.size(); i++) {
 		//find the slope
 		float currentLocation[2] = {astroids[i].getPosition().x,astroids[i].getPosition().y};
-		float slopeY = this->window->getSize().y / 2 - currentLocation[0];
-		float slopeX = this->window->getSize().x / 2 - currentLocation[1];
+		float slopeY = this->window->getSize().y/2 +100- currentLocation[0]/2;
+		float slopeX = this->window->getSize().x/2 +100 - currentLocation[1]/2;
 		float slope = slopeY / slopeX;
 		
 		//find next point on line, point slope form
