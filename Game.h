@@ -16,12 +16,7 @@ private:
 	//private functions
 	void initializeVariables();
 	void initWindow();
-	//player
-	player p;
-	//astroid
-	enemy a;
-	//colider
-	collider c;
+	
 protected:
 	//window pointer
 	sf::RenderWindow* window;
@@ -32,7 +27,7 @@ public:
 	//constructors / destructors
 	Game();
 	virtual ~Game();
-	//accesor
+	//accessor
 	const bool getWindowIsOpen();
 	//functions 
 	void pollEvents();
@@ -43,14 +38,13 @@ public:
 
 class player:Game {
 private:
-	int hp;
 	sf::Texture playerTex;
 	float playerAngle;
-	bool fireLimit;
 	//projectiles
 	sf::RectangleShape projectile;
 	std::vector<float> projectielePathX;
 	std::vector<float> projectielePathY;
+	void shootProjectiles(const float& angle);
 protected:
 	std::vector<sf::RectangleShape> projectieles;
 	sf::Sprite character;
@@ -59,7 +53,6 @@ public:
 	player();
 	virtual ~player();
 	void PlayerControl();
-	void shootProjectiles(const float& angle);
 	void updateProjectiles();
 	//lose function
 	void Lose();

@@ -76,18 +76,18 @@ void Game::render()
 	-clear old frame
 	-render and display new window
 	*/
-	
+	//static player p;
 	if(lose == false){
 		this->window->clear(sf::Color::White);
 		//draw stuff
 		//draw player
 		//colider
-		c.checkCollision();
-		p.PlayerControl();
+		//collider::checkCollision();
+		//p.PlayerControl();
 		//make and draw astroids 
-		a.createEnemies();
+		//enemy::createEnemies();
 		//update projectiles
-		p.updateProjectiles();
+		//player::updateProjectiles();
 	}
 	else {
 		this->window->clear(sf::Color::Red);
@@ -116,17 +116,20 @@ player::player()
 	//init projectiles 
 	this->projectile.setSize(sf::Vector2f(5.f, 10.5f));
 	this->projectile.setFillColor(sf::Color::Red);
-	this->fireLimit = true;
+	//rest of inits
+	this->playerAngle = 0.f;
 }
 
 player::~player()
 {
 }
 
-player::PlayerControl() {
-	/*
-	//rotate to face mouse
+void player::PlayerControl() {
 	
+	//rotate to face mouse
+	/*
+	is likley causeing crashes
+	*/
 	sf::Vector2i MousePos = sf::Mouse::getPosition(*(window));
 	float angle = atan2(this->character.getPosition().y - MousePos.y, this->character.getPosition().x - MousePos.x);
 	angle = (angle * 180.f) / 3.141f;
@@ -151,11 +154,10 @@ player::PlayerControl() {
 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
 		shootProjectiles(angle);
-		this->fireLimit = false;
 	}
 
 	this->window->draw(this->character);
-	*/
+	
 }
 
 void player::shootProjectiles(const float& angle)
