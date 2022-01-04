@@ -48,7 +48,7 @@ const bool Game::getWindowIsOpen()
 
 
 
-// public fucntions
+// public functions
 
 void Game::pollEvents()
 {
@@ -70,7 +70,7 @@ void Game::update()
 }
 
 
-void Game::render()
+void Game::render() const
 {
 	/*
 	-clear old frame
@@ -128,7 +128,7 @@ void player::PlayerControl() {
 	
 	//rotate to face mouse
 	/*
-	is likley causeing crashes
+	is likely causing crashes
 	*/
 	sf::Vector2i MousePos = sf::Mouse::getPosition(*(window));
 	float angle = atan2(this->character.getPosition().y - MousePos.y, this->character.getPosition().x - MousePos.x);

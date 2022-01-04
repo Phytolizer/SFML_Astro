@@ -32,7 +32,7 @@ public:
 	//functions 
 	void pollEvents();
 	void update();
-	void render();
+	void render() const;
 };
 
 
