@@ -10,49 +10,73 @@
 */
 class Game
 {
-protected:
-	sf::RenderWindow* window;
-
-
 private:
-	//private variables
-	// window
+	// events
 	sf::Event ev;
 	//private functions
 	void initializeVariables();
 	void initWindow();
-protected:
-	//game entities
-	//astroids
-	std::vector<sf::Sprite> astroids;
-	sf::Texture astroidTex;
-	sf::Sprite astroid;
 	//player
-	sf::Texture playerTex;
-	sf::Sprite player;
+	player p;
+	//astroid
+	enemy a;
+	//colider
+	collider c;
+protected:
+	//window pointer
+	sf::RenderWindow* window;
+	//win / loss condition
 	bool lose;
-	//projectiles
-	float playerAngle;
-	bool fireLimit;
-	sf::RectangleShape projectile;
-	std::vector<sf::RectangleShape> projectieles;
-	std::vector<float> projectielePathX;
-	std::vector<float> projectielePathY;
+	
 public:
 	//constructors / destructors
 	Game();
 	virtual ~Game();
-	//game object function 
-	void createEnemies();
-	void PlayerControl();
-	void shootProjectiles(const float& angle);
-	void updateProjectiles();
 	//accesor
 	const bool getWindowIsOpen();
-
 	//functions 
 	void pollEvents();
 	void update();
 	void render();
 };
 
+
+class player:Game {
+private:
+	int hp;
+	sf::Texture playerTex;
+	float playerAngle;
+	bool fireLimit;
+	//projectiles
+	sf::RectangleShape projectile;
+	std::vector<float> projectielePathX;
+	std::vector<float> projectielePathY;
+protected:
+	std::vector<sf::RectangleShape> projectieles;
+	sf::Sprite character;
+
+public:
+	player();
+	virtual ~player();
+	void PlayerControl();
+	void shootProjectiles(const float& angle);
+	void updateProjectiles();
+};
+
+class enemy:Game {
+private:
+	sf::Texture astroidTex;
+	sf::Sprite astroid;
+protected:
+	std::vector<sf::Sprite> astroids;
+
+public:
+	enemy();
+	virtual ~enemy();
+	void createEnemies();
+};
+
+class collider :player, enemy {
+public:
+	 void checkCollision();
+};
