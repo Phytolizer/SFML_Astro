@@ -39,6 +39,8 @@ Game::~Game()
 
 //accessors
 
+
+
 const bool Game::getWindowIsOpen()
 {
 	return this->window->isOpen();
@@ -86,7 +88,6 @@ void Game::render()
 		a.createEnemies();
 		//update projectiles
 		p.updateProjectiles();
-		
 	}
 	else {
 		this->window->clear(sf::Color::Red);
@@ -123,10 +124,9 @@ player::~player()
 }
 
 player::PlayerControl() {
-	//rotate to face mouse
 	/*
-	is likley causeing crashes
-	*/
+	//rotate to face mouse
+	
 	sf::Vector2i MousePos = sf::Mouse::getPosition(*(window));
 	float angle = atan2(this->character.getPosition().y - MousePos.y, this->character.getPosition().x - MousePos.x);
 	angle = (angle * 180.f) / 3.141f;
@@ -147,9 +147,7 @@ player::PlayerControl() {
 		this->character.move(0.f, 8.f);
 	}
 	//mouse inputs and fire inputs
-	/*
-	No idea why the fireLimit and fireTimer break aiming
-	*/
+	
 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
 		shootProjectiles(angle);
@@ -157,6 +155,7 @@ player::PlayerControl() {
 	}
 
 	this->window->draw(this->character);
+	*/
 }
 
 void player::shootProjectiles(const float& angle)
@@ -201,6 +200,11 @@ void player::updateProjectiles()
 
 		
 	}
+}
+
+void player::Lose()
+{
+	Game::lose = true;
 }
 
 
@@ -289,6 +293,7 @@ void collider::checkCollision()
 	for (size_t i = 0; astroids.size() > i; i++) {
 		if (astroids[i].getGlobalBounds().intersects(character.getGlobalBounds())) {
 			//create a lose function
+			this->Lose();
 			break;//we have to break out bc it will check a projectile that no longer igists if we stay in loop
 		}
 	}

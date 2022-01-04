@@ -61,12 +61,15 @@ public:
 	void PlayerControl();
 	void shootProjectiles(const float& angle);
 	void updateProjectiles();
+	//lose function
+	void Lose();
 };
 
 class enemy:Game {
 private:
 	sf::Texture astroidTex;
 	sf::Sprite astroid;
+	
 protected:
 	std::vector<sf::Sprite> astroids;
 
