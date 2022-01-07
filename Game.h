@@ -12,9 +12,6 @@ class Enemy {
 private:
 	sf::Texture astroidTex;
 	sf::Sprite astroid;
-	
-protected:
-	std::vector<sf::Sprite> astroids;
 
 public:
 	Enemy();

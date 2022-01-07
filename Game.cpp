@@ -11,6 +11,11 @@ void Game::initializeVariables()
 	// non-window-related initialization
 	this->lose = false;
 	this->player = new Player(window->getSize());
+
+	// N times
+	enemies.push_back(Enemy());
+	enemies.back().createEnemies(window->getSize());
+	enemies.push_back(Enemy());
 }
 
 void Game::initWindow()
@@ -250,6 +255,8 @@ Enemy::~Enemy()
 
 void Enemy::createEnemies(sf::Vector2u size)
 {
+	// TODO: Move to Game
+
 	//create new astroids
 	static short int spawnTimer = 80;
 	if (spawnTimer > 80) {
