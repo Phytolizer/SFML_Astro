@@ -1,12 +1,16 @@
 #include "Game.h"
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Window/Window.hpp>
+
+#include <cmath>
 
 //--------------------------------------------------game---------------------------------------------------------------
 void Game::initializeVariables()
 {
-	//init window
-	this->window = nullptr;
+	// non-window-related initialization
 	this->lose = false;
-	
+	this->player = new Player(window->getSize());
 }
 
 void Game::initWindow()
@@ -18,15 +22,13 @@ void Game::initWindow()
 	this->window->setMouseCursorGrabbed(true);
 
 	this->window->setFramerateLimit(60);
-	//sets loseptr
-	
 }
 
 //constructor
 Game::Game()
 {
-	this->initializeVariables();
 	this->initWindow();
+	this->initializeVariables();
 }
 
 //destructor
@@ -67,6 +69,7 @@ void Game::pollEvents()
 void Game::update()
 {
 	this->pollEvents();
+	this->Lose();
 }
 
 
@@ -82,12 +85,11 @@ void Game::render() const
 		//draw stuff
 		//draw player
 		//colider
-		//collider::checkCollision();
-		//p.PlayerControl();
+		player->PlayerControl(window);
 		//make and draw astroids 
 		//enemy::createEnemies();
 		//update projectiles
-		//player::updateProjectiles();
+		player->updateProjectiles(window);
 	}
 	else {
 		this->window->clear(sf::Color::Red);
@@ -99,32 +101,36 @@ void Game::render() const
 	this->window->display();
 }
 
+void Game::Lose() {
+	if (this->player->checkCollision(this->enemies)) {
+		lose = true;
+	}
+}
+
 //--------------------------------------------player functions-----------------------------------------------------------
 
-player::player()
+Player::Player(sf::Vector2u size)
 {
 	if (!playerTex.loadFromFile("textures/player.png")) {
-		throw "could not laod astroid.png";
+		throw "could not load player.png";
 	}
 	//set player texture
 	this->character.setTexture(this->playerTex);
 	this->character.scale(0.5f, 0.5f);
 	this->character.setOrigin(this->character.getGlobalBounds().width, this->character.getGlobalBounds().height / 2);
-	this->playerAngle = 0.f;
 	//sets player start position
-	this->character.setPosition(this->window->getSize().x / 2 - character.getGlobalBounds().width, this->window->getSize().y / 2 - character.getGlobalBounds().height);
+	this->character.setPosition(size.x / 2.f - character.getGlobalBounds().width, size.y / 2.f - character.getGlobalBounds().height);
 	//init projectiles 
 	this->projectile.setSize(sf::Vector2f(5.f, 10.5f));
 	this->projectile.setFillColor(sf::Color::Red);
-	//rest of inits
-	this->playerAngle = 0.f;
+	frameCounter = 0;
 }
 
-player::~player()
+Player::~Player()
 {
 }
 
-void player::PlayerControl() {
+void Player::PlayerControl(sf::RenderWindow* window) {
 	
 	//rotate to face mouse
 	/*
@@ -134,33 +140,32 @@ void player::PlayerControl() {
 	float angle = atan2(this->character.getPosition().y - MousePos.y, this->character.getPosition().x - MousePos.x);
 	angle = (angle * 180.f) / 3.141f;
 	this->character.setRotation(angle - 90);
-	this->playerAngle = this->character.getRotation();
 	//keyboard inputs
    //checks for keypress and keeps position of object on screen
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && this->character.getPosition().x - this->character.getGlobalBounds().width / 2 > 0) {
 		this->character.move(-8.f, 0.f);
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && this->character.getPosition().x + this->character.getGlobalBounds().width / 2 < this->window->getSize().x) {
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && this->character.getPosition().x + this->character.getGlobalBounds().width / 2 < window->getSize().x) {
 		this->character.move(8.f, 0.f);
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && this->character.getPosition().y - this->character.getGlobalBounds().height / 2 > 0) {
 		this->character.move(0.f, -8.f);
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && this->character.getPosition().y + this->character.getGlobalBounds().height / 2 < this->window->getSize().y) {
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && this->character.getPosition().y + this->character.getGlobalBounds().height / 2 < window->getSize().y) {
 		this->character.move(0.f, 8.f);
 	}
 	//mouse inputs and fire inputs
-	
+	++frameCounter;
 
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-		shootProjectiles(angle);
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && frameCounter > 20) {
+		shootProjectiles(angle, window);
+		frameCounter = 0;
 	}
 
-	this->window->draw(this->character);
-	
+	window->draw(this->character);
 }
 
-void player::shootProjectiles(const float& angle)
+void Player::shootProjectiles(const float& angle, sf::RenderWindow* window)
 {
 	this->projectile.rotate(angle);
 	this->projectile.setPosition(this->character.getPosition());
@@ -174,7 +179,7 @@ void player::shootProjectiles(const float& angle)
 	projectielePathY.push_back(moveY);
 }
 
-void player::updateProjectiles()
+void Player::updateProjectiles(sf::RenderWindow* window)
 {
 
 	/*
@@ -183,13 +188,13 @@ void player::updateProjectiles()
 
 	*/
 	for (size_t i = 0; i < projectieles.size(); i++) {
-		if (projectieles[i].getPosition().x < 0 || projectieles[i].getPosition().x > this->window->getSize().x) {
+		if (projectieles[i].getPosition().x < 0 || projectieles[i].getPosition().x > window->getSize().x) {
 			projectieles.erase(projectieles.begin() + i);
 			projectielePathX.erase(projectielePathX.begin() + i);
 			projectielePathY.erase(projectielePathY.begin() + i);
 			continue;
 		}
-		else if (projectieles[i].getPosition().y < 0 || projectieles[i].getPosition().y > this->window->getSize().y) {
+		else if (projectieles[i].getPosition().y < 0 || projectieles[i].getPosition().y > window->getSize().y) {
 			projectieles.erase(projectieles.begin() + i);
 			projectielePathX.erase(projectielePathX.begin() + i);
 			projectielePathY.erase(projectielePathY.begin() + i);
@@ -197,22 +202,37 @@ void player::updateProjectiles()
 		}
 		else {
 			projectieles[i].move(projectielePathX[i] / 20, projectielePathY[i] / 20);
-			this->window->draw(projectieles[i]);
+			window->draw(projectieles[i]);
 		}
 
 		
 	}
 }
 
-void player::Lose()
-{
-	Game::lose = true;
+bool Player::checkCollision(std::vector<Enemy> &enemies) {
+	//check for colllision between the projectiles and astroids
+	for (size_t i = 0; i < projectieles.size(); i++) {
+		for (size_t j = 0; enemies.size() > j; j++) {
+			if (projectieles[i].getGlobalBounds().intersects(enemies[j].getBounds())) {
+				projectieles.erase(projectieles.begin() + i);
+				enemies.erase(enemies.begin() + j);
+				break;//we have to break out bc it will check a projectile that no longer igists if we stay in loop
+			}
+		}
+	}
+	//checks for inpact of player and astroid
+	for (size_t i = 0; enemies.size() > i; i++) {
+		if (enemies[i].getBounds().intersects(character.getGlobalBounds())) {
+			//create a lose function
+			return true;
+		}
+	}
+	return false;
 }
-
 
 //-----------------------------------------------enemy ------------------------------------------------------------------------
 
-enemy::enemy()
+Enemy::Enemy()
 {
 	//load the texture
 	if (!astroidTex.loadFromFile("textures/astroid.png")) {
@@ -224,11 +244,11 @@ enemy::enemy()
 	this->astroid.scale(0.5f, 0.5f);
 }
 
-enemy::~enemy()
+Enemy::~Enemy()
 {
 }
 
-void enemy::createEnemies()
+void Enemy::createEnemies(sf::Vector2u size)
 {
 	//create new astroids
 	static short int spawnTimer = 80;
@@ -247,10 +267,10 @@ void enemy::createEnemies()
 	//check for out of bounds
 
 	for (size_t i = 0; i < astroids.size(); i++) {
-		if (astroids[i].getPosition().x - 901 > this->window->getSize().x - astroid.getGlobalBounds().width) {
+		if (astroids[i].getPosition().x - 901 > size.x - astroid.getGlobalBounds().width) {
 			astroids.erase(astroids.begin() + i);
 		}
-		else if (astroids[i].getPosition().y - 901 > this->window->getSize().y - astroid.getGlobalBounds().height) {
+		else if (astroids[i].getPosition().y - 901 > size.y - astroid.getGlobalBounds().height) {
 			astroids.erase(astroids.begin() + i);
 		}
 		else if (astroids[i].getPosition().x + 901 < 0 - astroid.getGlobalBounds().width) {
@@ -260,13 +280,15 @@ void enemy::createEnemies()
 			astroids.erase(astroids.begin() + i);
 		}
 	}
+}
 
+void Enemy::draw(sf::RenderWindow* window) {
 	//draw the astroids 
 	for (size_t i = 0; i < astroids.size(); i++) {
 		//find the slope
 		float currentLocation[2] = { astroids[i].getPosition().x,astroids[i].getPosition().y };
-		float slopeY = this->window->getSize().y / 2 - currentLocation[0];
-		float slopeX = this->window->getSize().x / 2 - currentLocation[1];
+		float slopeY = window->getSize().y / 2.f - currentLocation[0];
+		float slopeX = window->getSize().x / 2.f - currentLocation[1];
 		float slope = slopeY / slopeX;
 
 		//find next point on line, point slope form
@@ -274,29 +296,10 @@ void enemy::createEnemies()
 		float nextY = -1 * (slope * ((currentLocation[1] - 4.f) - currentLocation[1])) + currentLocation[0];
 
 		astroids[i].move(4.f, (nextY - currentLocation[0]));
-		this->window->draw(this->astroids[i]);
-
+		window->draw(this->astroids[i]);
 	}
 }
 
-void collider::checkCollision()
-{
-	//check for colllision between the projectiles and astroids
-	for (size_t i = 0; projectieles.size(); i++) {
-		for (size_t j = 0; astroids.size() > j; j++) {
-			if (projectieles[i].getGlobalBounds().intersects(astroids[j].getGlobalBounds())) {
-				projectieles.erase(projectieles.begin() + i);
-				astroids.erase(astroids.begin() + j);
-				break;//we have to break out bc it will check a projectile that no longer igists if we stay in loop
-			}
-		}
-	}
-	//checks for inpact of player and astroid
-	for (size_t i = 0; astroids.size() > i; i++) {
-		if (astroids[i].getGlobalBounds().intersects(character.getGlobalBounds())) {
-			//create a lose function
-			this->Lose();
-			break;//we have to break out bc it will check a projectile that no longer igists if we stay in loop
-		}
-	}
+sf::FloatRect Enemy::getBounds() const {
+	return this->astroid.getGlobalBounds();
 }
