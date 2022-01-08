@@ -7,7 +7,7 @@
 #include "SFML/System.hpp"
 #include "SFML/Window.hpp"
 #include <vector>
-
+#include <iostream>
 class Enemy {
 private:
 	sf::Texture astroidTex;
@@ -16,9 +16,11 @@ private:
 public:
 	Enemy();
 	virtual ~Enemy();
-	void createEnemies(sf::Vector2u size);
 	void draw(sf::RenderWindow* window);
-	sf::FloatRect getBounds() const;
+	void createEnemies();
+	sf::FloatRect get_bounds();
+	sf::Vector2f get_pos();
+	void move(const float &x,const float &y);
 };
 
 
@@ -52,7 +54,7 @@ private:
 	// events
 	sf::Event ev;
 
-	// colliders
+	// collides
 	Player* player;
 	std::vector<Enemy> enemies;
 
@@ -64,6 +66,7 @@ private:
 	sf::RenderWindow* window;
 	//win / loss condition
 	bool lose;
+	size_t frameCounter;
 	
 public:
 	//constructors / destructors
@@ -71,10 +74,11 @@ public:
 	virtual ~Game();
 	//accessor
 	const bool getWindowIsOpen();
-	//functions 
+	//functions
 	void pollEvents();
+	void make_enemy(sf::Vector2u size);
 	void update();
-	void render() const;
+	void render();
 	//lose function
 	void Lose();
 };

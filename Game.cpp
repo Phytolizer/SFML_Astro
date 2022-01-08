@@ -11,11 +11,9 @@ void Game::initializeVariables()
 	// non-window-related initialization
 	this->lose = false;
 	this->player = new Player(window->getSize());
-
-	// N times
-	enemies.push_back(Enemy());
-	enemies.back().createEnemies(window->getSize());
-	enemies.push_back(Enemy());
+	this->frameCounter = 80;
+	// this->make_enemy(window->getSize());
+	
 }
 
 void Game::initWindow()
@@ -71,6 +69,7 @@ void Game::pollEvents()
     }
 }
 
+
 void Game::update()
 {
 	this->pollEvents();
@@ -78,23 +77,21 @@ void Game::update()
 }
 
 
-void Game::render() const
+void Game::render()
 {
 	/*
 	-clear old frame
 	-render and display new window
 	*/
-	//static player p;
+	
 	if(lose == false){
-		this->window->clear(sf::Color::White);
+		this->window->clear(sf::Color::Black);
 		//draw stuff
-		//draw player
-		//colider
+		
 		player->PlayerControl(window);
-		//make and draw astroids 
-		//enemy::createEnemies();
 		//update projectiles
 		player->updateProjectiles(window);
+		this->make_enemy(window->getSize());
 	}
 	else {
 		this->window->clear(sf::Color::Red);
@@ -106,6 +103,49 @@ void Game::render() const
 	this->window->display();
 }
 
+void Game::make_enemy(sf::Vector2u size)
+{
+	++frameCounter;
+	
+	if(frameCounter >= 80)
+	{
+		enemies.push_back(Enemy());
+		enemies.back().createEnemies();
+		frameCounter = 0;
+	}
+	for (size_t i = 0; i < enemies.size(); i++) {
+		//get location 
+		const sf::Vector2f location = this->enemies[i].get_pos();
+		
+		 if (location.x - 901 > size.x - location.x) {
+		 	enemies.erase(enemies.begin() + i);
+		 	continue;
+		 }else if (location.y - 901 > size.y - location.y) {
+		 	enemies.erase(enemies.begin() + i);
+		 	continue;
+		 }else if (location.x + 901 < 0 - location.x) {
+		 	enemies.erase(enemies.begin() + i);
+		 	continue;
+		 }else if (location.y + 901 < 0 - location.y) {
+		 	enemies.erase(enemies.begin() + i);
+		 	continue;
+		 }
+		 //find the slope
+		
+		 float slopeY = size.y / 2.f - location.y;
+		 float slopeX = size.x / 2.f - location.x;
+		 float slope = slopeY / slopeX;
+		
+		 //find next point on line, point slope form
+		 //curent location 1 is the x cord, loaction 0 is y
+		 float nextY = -1 * (slope * ((location.x - 4.f) - location.x)) + location.y;
+		
+		enemies[i].move(4.f, (nextY - location.y));
+		enemies[i].draw(this->window);
+	}
+	
+}
+ 
 void Game::Lose() {
 	if (this->player->checkCollision(this->enemies)) {
 		lose = true;
@@ -138,25 +178,23 @@ Player::~Player()
 void Player::PlayerControl(sf::RenderWindow* window) {
 	
 	//rotate to face mouse
-	/*
-	is likely causing crashes
-	*/
 	sf::Vector2i MousePos = sf::Mouse::getPosition(*(window));
 	float angle = atan2(this->character.getPosition().y - MousePos.y, this->character.getPosition().x - MousePos.x);
 	angle = (angle * 180.f) / 3.141f;
 	this->character.setRotation(angle - 90);
+
 	//keyboard inputs
    //checks for keypress and keeps position of object on screen
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && this->character.getPosition().x - this->character.getGlobalBounds().width / 2 > 0) {
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && this->character.getPosition().x - this->character.getGlobalBounds().width / 2.f > 0.f) {
 		this->character.move(-8.f, 0.f);
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && this->character.getPosition().x + this->character.getGlobalBounds().width / 2 < window->getSize().x) {
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && this->character.getPosition().x + this->character.getGlobalBounds().width / 2.f < window->getSize().x) {
 		this->character.move(8.f, 0.f);
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && this->character.getPosition().y - this->character.getGlobalBounds().height / 2 > 0) {
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && this->character.getPosition().y - this->character.getGlobalBounds().height / 2.f > 0.f) {
 		this->character.move(0.f, -8.f);
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && this->character.getPosition().y + this->character.getGlobalBounds().height / 2 < window->getSize().y) {
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && this->character.getPosition().y + this->character.getGlobalBounds().height / 2.f < window->getSize().y) {
 		this->character.move(0.f, 8.f);
 	}
 	//mouse inputs and fire inputs
@@ -172,6 +210,9 @@ void Player::PlayerControl(sf::RenderWindow* window) {
 
 void Player::shootProjectiles(const float& angle, sf::RenderWindow* window)
 {
+	//TODO:why fly in random directions sometimes
+	//began after adding astroids
+
 	this->projectile.rotate(angle);
 	this->projectile.setPosition(this->character.getPosition());
 	sf::Vector2i mousePos = sf::Mouse::getPosition(*(window));
@@ -218,7 +259,7 @@ bool Player::checkCollision(std::vector<Enemy> &enemies) {
 	//check for colllision between the projectiles and astroids
 	for (size_t i = 0; i < projectieles.size(); i++) {
 		for (size_t j = 0; enemies.size() > j; j++) {
-			if (projectieles[i].getGlobalBounds().intersects(enemies[j].getBounds())) {
+			if (projectieles[i].getGlobalBounds().intersects(enemies[j].get_bounds())) {
 				projectieles.erase(projectieles.begin() + i);
 				enemies.erase(enemies.begin() + j);
 				break;//we have to break out bc it will check a projectile that no longer igists if we stay in loop
@@ -227,12 +268,12 @@ bool Player::checkCollision(std::vector<Enemy> &enemies) {
 	}
 	//checks for inpact of player and astroid
 	for (size_t i = 0; enemies.size() > i; i++) {
-		if (enemies[i].getBounds().intersects(character.getGlobalBounds())) {
+		if (enemies[i].get_bounds().intersects(character.getGlobalBounds())) {
 			//create a lose function
 			return true;
 		}
 	}
-	return false;
+	 return false;
 }
 
 //-----------------------------------------------enemy ------------------------------------------------------------------------
@@ -240,8 +281,8 @@ bool Player::checkCollision(std::vector<Enemy> &enemies) {
 Enemy::Enemy()
 {
 	//load the texture
-	if (!astroidTex.loadFromFile("textures/astroid.png")) {
-		throw "could not laod astroid.png";
+	if (!this->astroidTex.loadFromFile("textures/astroid.png")) {
+		throw "could not load astroid.png";
 	}
 
 	//set astroid texture
@@ -253,60 +294,39 @@ Enemy::~Enemy()
 {
 }
 
-void Enemy::createEnemies(sf::Vector2u size)
+void Enemy::createEnemies()
 {
-	// TODO: Move to Game
-
-	//create new astroids
-	static short int spawnTimer = 80;
-	if (spawnTimer > 80) {
+	// TODO: fix spawn algurithem
+	static unsigned int spawnTimer=0;
+	++spawnTimer;
+	
+	if (spawnTimer >= 80) {
 		float randomSpawnX = (rand() % 900) * -1.f;
 		float randomSpawnY = (rand() % 900) * -1.f;
-		astroid.setPosition(sf::Vector2f(randomSpawnX, randomSpawnY));
-		astroids.push_back(sf::Sprite(astroid));
-
+		// float randomSpawnX = 500;
+		// float randomSpawnY = 500;
+		this->astroid.setPosition(sf::Vector2f(randomSpawnX, randomSpawnY));
 		spawnTimer = 0;
 	}
-	else {
-		spawnTimer++;
-	}
-
-	//check for out of bounds
-
-	for (size_t i = 0; i < astroids.size(); i++) {
-		if (astroids[i].getPosition().x - 901 > size.x - astroid.getGlobalBounds().width) {
-			astroids.erase(astroids.begin() + i);
-		}
-		else if (astroids[i].getPosition().y - 901 > size.y - astroid.getGlobalBounds().height) {
-			astroids.erase(astroids.begin() + i);
-		}
-		else if (astroids[i].getPosition().x + 901 < 0 - astroid.getGlobalBounds().width) {
-			astroids.erase(astroids.begin() + i);
-		}
-		else if (astroids[i].getPosition().y + 901 < 0 - astroid.getGlobalBounds().height) {
-			astroids.erase(astroids.begin() + i);
-		}
-	}
+	
 }
 
-void Enemy::draw(sf::RenderWindow* window) {
-	//draw the astroids 
-	for (size_t i = 0; i < astroids.size(); i++) {
-		//find the slope
-		float currentLocation[2] = { astroids[i].getPosition().x,astroids[i].getPosition().y };
-		float slopeY = window->getSize().y / 2.f - currentLocation[0];
-		float slopeX = window->getSize().x / 2.f - currentLocation[1];
-		float slope = slopeY / slopeX;
 
-		//find next point on line, point slope form
-		//curent location 1 is the x cord, loaction 0 is y
-		float nextY = -1 * (slope * ((currentLocation[1] - 4.f) - currentLocation[1])) + currentLocation[0];
-
-		astroids[i].move(4.f, (nextY - currentLocation[0]));
-		window->draw(this->astroids[i]);
-	}
-}
-
-sf::FloatRect Enemy::getBounds() const {
+sf::FloatRect Enemy::get_bounds()
+{
 	return this->astroid.getGlobalBounds();
+}
+sf::Vector2f Enemy::get_pos() 
+{
+	return this->astroid.getPosition();
+}
+void Enemy::draw(sf::RenderWindow* window)
+{
+	//TODO: why do i have to set texture hear
+	this->astroid.setTexture(this->astroidTex);
+	window->draw(this->astroid);
+}
+void Enemy::move(const float& x, const float& y)
+{
+	this->astroid.move(x, y);
 }
