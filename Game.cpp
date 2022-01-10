@@ -12,15 +12,12 @@ void Game::initializeVariables()
 	this->lose = false;
 	this->player = new Player(window->getSize());
 	this->frameCounter = 80;
-	// this->make_enemy(window->getSize());
+	
 	
 }
 
 void Game::initWindow()
 {
-	//Game* e;
-	//e->window = new sf::RenderWindow(sf::VideoMode(900, 900), "Game 1", sf::Style::Close);
-	//cleaner verson of below
 	this->window = new sf::RenderWindow(sf::VideoMode(900, 900), "Game 1", sf::Style::Default);
 	this->window->setMouseCursorGrabbed(true);
 
@@ -102,7 +99,6 @@ void Game::render()
 	}
 	else {
 		this->window->clear(sf::Color::Red);
-		//create lose function
 	}
 	
 	
@@ -328,7 +324,7 @@ void Enemy::move(const float& x, const float& y)
 {
 	this->astroid.move(x, y);
 }
-
+//------------------------------------------------------power up -----------------------------------------------------
 powerUp::powerUp()
 {
 	this->boostObj.setRadius(50);

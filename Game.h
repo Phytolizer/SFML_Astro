@@ -53,10 +53,7 @@ public:
 	bool checkCollision(std::vector<Enemy> &enemies);
 };
 
-/*
-	class that acts as game engine
-	wrapper class
-*/
+
 class Game
 {
 private:
