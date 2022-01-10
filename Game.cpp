@@ -91,6 +91,13 @@ void Game::render()
 		player->PlayerControl(window);
 		//update projectiles
 		player->updateProjectiles(window);
+
+		//TODO: why does it not like to shoot projectiles right when enemies spawn
+		/*
+		 * to recreate hold down the fire button while turning and moving
+		 * The projectiles are moving but they are behind or not update with the player
+		 */
+
 		this->make_enemy(window->getSize());
 	}
 	else {
@@ -210,7 +217,6 @@ void Player::PlayerControl(sf::RenderWindow* window) {
 
 void Player::shootProjectiles(const float& angle, sf::RenderWindow* window)
 {
-	//TODO:why fly in random directions sometimes
 	//began after adding astroids
 
 	this->projectile.rotate(angle);
@@ -250,8 +256,6 @@ void Player::updateProjectiles(sf::RenderWindow* window)
 			projectieles[i].move(projectielePathX[i] / 20, projectielePathY[i] / 20);
 			window->draw(projectieles[i]);
 		}
-
-		
 	}
 }
 
@@ -297,18 +301,12 @@ Enemy::~Enemy()
 void Enemy::createEnemies()
 {
 	// TODO: fix spawn algurithem
-	static unsigned int spawnTimer=0;
-	++spawnTimer;
 	
-	if (spawnTimer >= 80) {
-		float randomSpawnX = (rand() % 900) * -1.f;
-		float randomSpawnY = (rand() % 900) * -1.f;
-		// float randomSpawnX = 500;
-		// float randomSpawnY = 500;
-		this->astroid.setPosition(sf::Vector2f(randomSpawnX, randomSpawnY));
-		spawnTimer = 0;
-	}
-	
+	float randomSpawnX = (rand() % 900) * -1.f;
+	float randomSpawnY = (rand() % 900) * -1.f;
+	// float randomSpawnX = 500;
+	// float randomSpawnY = 500;
+	this->astroid.setPosition(sf::Vector2f(randomSpawnX, randomSpawnY));
 }
 
 
