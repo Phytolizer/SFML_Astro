@@ -23,7 +23,16 @@ public:
 	void move(const float &x,const float &y);
 };
 
-
+class powerUp{
+private:
+	sf::CircleShape boostObj;
+	unsigned int boostLevel;
+public:
+	powerUp();
+	virtual ~powerUp();
+	void spawnPowerUp();
+	void movePowerUp();
+};
 class Player {
 private:
 	sf::Texture playerTex;

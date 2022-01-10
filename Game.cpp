@@ -253,7 +253,7 @@ void Player::updateProjectiles(sf::RenderWindow* window)
 			continue;
 		}
 		else {
-			projectieles[i].move(projectielePathX[i] / 20, projectielePathY[i] / 20);
+			projectieles[i].move(projectielePathX[i] / 10, projectielePathY[i] / 10);
 			window->draw(projectieles[i]);
 		}
 	}
@@ -300,7 +300,7 @@ Enemy::~Enemy()
 
 void Enemy::createEnemies()
 {
-	// TODO: fix spawn algurithem
+	// TODO: fix spawn algurithem enemy
 	
 	float randomSpawnX = (rand() % 900) * -1.f;
 	float randomSpawnY = (rand() % 900) * -1.f;
@@ -328,3 +328,38 @@ void Enemy::move(const float& x, const float& y)
 {
 	this->astroid.move(x, y);
 }
+
+powerUp::powerUp()
+{
+	this->boostObj.setRadius(50);
+	this->boostLevel = (rand() % 3);
+	switch (boostLevel)
+	{
+	case 1:
+		this->boostObj.setFillColor(sf::Color::Yellow);
+	case 2:
+		this->boostObj.setFillColor(sf::Color::Cyan);
+	case 3:
+		this->boostObj.setFillColor(sf::Color::Green);
+		default:
+			throw "error in assigning color to the power up";
+	}
+}
+
+void powerUp::spawnPowerUp()
+{
+	// TODO: fix spawn algurithem power up
+
+	float randomSpawnX = (rand() % 900) * -1.f;
+	float randomSpawnY = (rand() % 900) * -1.f;
+	// float randomSpawnX = 500;
+	// float randomSpawnY = 500;
+	this->boostObj.setPosition(sf::Vector2f(randomSpawnX, randomSpawnY));
+}
+
+void powerUp::movePowerUp()
+{
+	//TODO:Move power up
+}
+
+
