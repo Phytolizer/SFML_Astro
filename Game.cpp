@@ -334,6 +334,10 @@ powerUp::powerUp()
     }
 }
 
+powerUp::~powerUp()
+{
+}
+
 void powerUp::spawnPowerUp()
 {
     // TODO: fix spawn algurithem power up
