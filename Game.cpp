@@ -11,7 +11,7 @@ void Game::initializeVariables() {
     this->lose = false;
     this->player = new Player(window->getSize());
     this->frameCounter = 80;
-    this->powerUpFrameCounter = 80;
+    this->powerUpFrameCounter = 800;
 
 }
 
@@ -34,7 +34,7 @@ Game::Game()
 Game::~Game()
 {
     delete this->window;
-
+    delete this->player;
 }
 
 
@@ -149,7 +149,7 @@ void Game::make_powerUp(sf::Vector2u size)
 {
     ++powerUpFrameCounter;
 
-    if (powerUpFrameCounter >= 80) {
+    if (powerUpFrameCounter >= 800) {
         powerUps.push_back(powerUp());
         powerUps.back().CreatePowerUp();
         powerUpFrameCounter = 0;
@@ -366,10 +366,11 @@ void Enemy::move(const float& x, const float& y)
 //------------------------------------------------------power up -----------------------------------------------------
 powerUp::powerUp()
 {
-    this->boostObj.setRadius(50);
-    this->boostLevel = (rand() % 3);
-    switch (boostLevel) {
-        case 1:
+    this->boostObj.setRadius(25);
+    this->boostLevel = 1;
+    //TODO: add effect and randomness of boosts
+    /*switch (boostLevel) {
+        case (1):
             this->boostObj.setFillColor(sf::Color::Yellow);
         case 2:
             this->boostObj.setFillColor(sf::Color::Cyan);
@@ -377,7 +378,7 @@ powerUp::powerUp()
             this->boostObj.setFillColor(sf::Color::Green);
         default:
             throw "error in assigning color to the power up";
-    }
+    }*/
 }
 
 powerUp::~powerUp()
@@ -397,7 +398,6 @@ void powerUp::CreatePowerUp()
 
 void powerUp::move(const float& x, const float& y)
 {
-    //TODO:Move power up
     this->boostObj.move(x,y);
 }
 
