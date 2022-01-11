@@ -1,23 +1,28 @@
 #pragma once
-#include <SFML/Graphics/RenderTarget.hpp>
-#include <SFML/System/Vector2.hpp>
+
 #include <cstddef>
 #include <iostream>
-#include "SFML/Graphics.hpp"
-#include "SFML/System.hpp"
-#include "SFML/Window.hpp"
 #include <vector>
 #include <iostream>
+#include "include/SFML/Graphics/RenderTarget.hpp"
+#include "include/SFML/System/Vector2.hpp"
+#include "include/SFML/Graphics.hpp"
+#include "include/SFML/System.hpp"
+#include "include/SFML/Window.hpp"
+
 class Enemy {
 private:
-	sf::Texture astroidTex;
-	sf::Sprite astroid;
+    sf::Texture astroidTex;
+    sf::Sprite astroid;
 
 public:
-	Enemy();
-	virtual ~Enemy();
-	void draw(sf::RenderWindow* window);
-	void createEnemies();
+    Enemy();
+
+    virtual ~Enemy();
+
+    void draw(sf::RenderWindow *window);
+
+    void createEnemies();
 	sf::FloatRect get_bounds();
 	sf::Vector2f get_pos();
 	void move(const float &x,const float &y);
