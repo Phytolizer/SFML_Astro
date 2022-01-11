@@ -363,3 +363,9 @@ MigrationBackup/
 FodyWeavers.xsd
 
 /build
+/cmake-build-debug/
+/.idea/.gitignore
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/SFML_Astro2.iml
+/.idea/vcs.xml
