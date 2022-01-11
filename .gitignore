@@ -9,10 +9,6 @@
 *.user
 *.userosscache
 *.sln.docstates
-SFML_Astro.vcxproj.filters
-SFML_Astro.vcxproj
-SFML_Astro.sln
-CMakeLists.txt
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -367,4 +363,3 @@ MigrationBackup/
 FodyWeavers.xsd
 
 /build
-/cmake-build-debug/
