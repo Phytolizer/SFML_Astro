@@ -11,7 +11,7 @@ void Game::initializeVariables() {
     this->lose = false;
     this->player = new Player(window->getSize());
     this->frameCounter = 80;
-
+    this->powerUpFrameCounter = 80;
 
 }
 
@@ -94,6 +94,7 @@ void Game::render()
          */
 
         this->make_enemy(window->getSize());
+        this->make_powerUp(window->getSize());
     } else {
         this->window->clear(sf::Color::Red);
     }
@@ -140,6 +141,51 @@ void Game::make_enemy(sf::Vector2u size)
 
         enemies[i].move(4.f, (nextY - location.y));
         enemies[i].draw(this->window);
+    }
+
+}
+
+void Game::make_powerUp(sf::Vector2u size)
+{
+    ++powerUpFrameCounter;
+
+    if (powerUpFrameCounter >= 80) {
+        powerUps.push_back(powerUp());
+        powerUps.back().CreatePowerUp();
+        powerUpFrameCounter = 0;
+    }
+    for (size_t i = 0; i < powerUps.size(); i++) {
+        //get location
+        const sf::Vector2f location = this->powerUps[i].getPos();
+
+        if (location.x - 901 > size.x - location.x) {
+            powerUps.erase(powerUps.begin() + i);
+            continue;
+        }
+        else if (location.y - 901 > size.y - location.y) {
+            powerUps.erase(powerUps.begin() + i);
+            continue;
+        }
+        else if (location.x + 901 < 0 - location.x) {
+            powerUps.erase(powerUps.begin() + i);
+            continue;
+        }
+        else if (location.y + 901 < 0 - location.y) {
+            powerUps.erase(powerUps.begin() + i);
+            continue;
+        }
+        //find the slope
+
+        float slopeY = size.y / 2.f - location.y;
+        float slopeX = size.x / 2.f - location.x;
+        float slope = slopeY / slopeX;
+
+        //find next point on line, point slope form
+        //curent location 1 is the x cord, loaction 0 is y
+        float nextY = -1 * (slope * ((location.x - 4.f) - location.x)) + location.y;
+
+        powerUps[i].move(4.f, (nextY - location.y));
+        powerUps[i].draw(this->window);
     }
 
 }
@@ -338,9 +384,9 @@ powerUp::~powerUp()
 {
 }
 
-void powerUp::spawnPowerUp()
+void powerUp::CreatePowerUp()
 {
-    // TODO: fix spawn algurithem power up
+    // TODO: fix spawn algorithm power up
 
     float randomSpawnX = (rand() % 900) * -1.f;
     float randomSpawnY = (rand() % 900) * -1.f;
@@ -349,9 +395,20 @@ void powerUp::spawnPowerUp()
     this->boostObj.setPosition(sf::Vector2f(randomSpawnX, randomSpawnY));
 }
 
-void powerUp::movePowerUp()
+void powerUp::move(const float& x, const float& y)
 {
     //TODO:Move power up
+    this->boostObj.move(x,y);
+}
+
+void powerUp::draw(sf::RenderWindow* window)
+{
+	window->draw(this->boostObj);
+}
+
+sf::Vector2f powerUp::getPos()
+{
+    return this->boostObj.getPosition();
 }
 
 

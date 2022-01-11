@@ -35,9 +35,14 @@ private:
 public:
 	powerUp();
 	virtual ~powerUp();
-	void spawnPowerUp();
-	void movePowerUp();
+	void CreatePowerUp();
+	void move(const float& x, const float& y);
+	void draw(sf::RenderWindow* window);
+	sf::Vector2f getPos();
 };
+
+
+
 class Player {
 private:
 	sf::Texture playerTex;
@@ -68,7 +73,7 @@ private:
 	// collides
 	Player* player;
 	std::vector<Enemy> enemies;
-
+	std::vector<powerUp> powerUps;
 	//private functions
 	void initializeVariables();
 	void initWindow();
@@ -78,7 +83,7 @@ private:
 	//win / loss condition
 	bool lose;
 	size_t frameCounter;
-	
+	size_t powerUpFrameCounter;
 public:
 	//constructors / destructors
 	Game();
@@ -87,9 +92,10 @@ public:
 	const bool getWindowIsOpen();
 	//functions
 	void pollEvents();
-	void make_enemy(sf::Vector2u size);
 	void update();
 	void render();
+	void make_enemy(sf::Vector2u size);
+	void make_powerUp(sf::Vector2u size);
 	//lose function
 	void Lose();
 };
