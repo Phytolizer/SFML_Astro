@@ -109,7 +109,7 @@ void Game::make_enemy(sf::Vector2u size)
 
     if(frameCounter >= 80) {
         enemies.push_back(Enemy());
-        enemies.back().createEnemies();
+        enemies.back().createEnemies(window->getSize().x,window->getSize().y);
         frameCounter = 0;
     }
     for (size_t i = 0; i < enemies.size(); i++) {
@@ -333,15 +333,17 @@ Enemy::~Enemy()
 {
 }
 
-void Enemy::createEnemies()
+void Enemy::createEnemies(const float& window_x, const float& window_y)
 {
-    // TODO: fix spawn algurithem enemy
-
-    float randomSpawnX = (rand() % 900) * -1.f;
-    float randomSpawnY = (rand() % 900) * -1.f;
-    // float randomSpawnX = 500;
-    // float randomSpawnY = 500;
-    this->astroid.setPosition(sf::Vector2f(randomSpawnX, randomSpawnY));
+    // TODO: fix spawn alguritem enemy
+    //y = k + sqrt(r^2 - (x-u)^2)
+    //y = k- sqrt(r^2 - (x-u)^2)  
+    double randomXSpawn = (rand() % 900) * -1.f;
+    double randomYSpawn = (window_x / 2) + std::sqrt(pow(900, 2) - pow((randomXSpawn - (window_y / 2)),2));
+    //float randomXSpawn = (rand() % 900) * -1.f;
+    //float randomYSpawn = (rand() % 900) * -1.f;
+    std::cout << "x:" << randomXSpawn << " Y:" << randomYSpawn << std::endl;
+    this->astroid.setPosition(sf::Vector2f(randomXSpawn, randomYSpawn));
 }
 
 

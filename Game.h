@@ -22,7 +22,7 @@ public:
 
     void draw(sf::RenderWindow *window);
 
-    void createEnemies();
+    void createEnemies(const float& x, const float& y);
 	sf::FloatRect get_bounds();
 	sf::Vector2f get_pos();
 	void move(const float &x,const float &y);
