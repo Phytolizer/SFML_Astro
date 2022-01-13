@@ -106,6 +106,7 @@ void Game::render()
 void Game::make_enemy(sf::Vector2u size)
 {
     ++frameCounter;
+    //TODO: make so enemies ups that spawn on the positive x side of the screen move across the screen
 
     if(frameCounter >= 80) {
         enemies.push_back(Enemy());
@@ -147,11 +148,12 @@ void Game::make_enemy(sf::Vector2u size)
 
 void Game::make_powerUp(sf::Vector2u size)
 {
+    //TODO: make so power ups that spawn on the positive x side of the screen move across the screen
     ++powerUpFrameCounter;
 
     if (powerUpFrameCounter >= 800) {
         powerUps.push_back(powerUp());
-        powerUps.back().CreatePowerUp();
+        powerUps.back().CreatePowerUp(window->getSize().x,window->getSize().y);
         powerUpFrameCounter = 0;
     }
     for (size_t i = 0; i < powerUps.size(); i++) {
@@ -176,12 +178,12 @@ void Game::make_powerUp(sf::Vector2u size)
         }
         //find the slope
 
-        float slopeY = size.y / 2.f - location.y;
-        float slopeX = size.x / 2.f - location.x;
+        float slopeY = size.y / 2.f - location.y/2.f;
+        float slopeX = size.x / 2.f - location.x/2.f;
         float slope = slopeY / slopeX;
 
         //find next point on line, point slope form
-        //curent location 1 is the x cord, loaction 0 is y
+        //curent location 1 is the x cord, location 0 is y
         float nextY = -1 * (slope * ((location.x - 4.f) - location.x)) + location.y;
 
         powerUps[i].move(4.f, (nextY - location.y));
@@ -335,13 +337,25 @@ Enemy::~Enemy()
 
 void Enemy::createEnemies(const float& window_x, const float& window_y)
 {
-    // TODO: fix spawn alguritem enemy
-    //y = k + sqrt(r^2 - (x-u)^2)
-    //y = k- sqrt(r^2 - (x-u)^2)  
-    double randomXSpawn = (rand() % 900) * -1.f;
-    double randomYSpawn = (window_x / 2) + std::sqrt(pow(900, 2) - pow((randomXSpawn - (window_y / 2)),2));
-    //float randomXSpawn = (rand() % 900) * -1.f;
-    //float randomYSpawn = (rand() % 900) * -1.f;
+    /*
+     *function uses equation of a circle by solving for y to spawn powerUps around the screen
+     *y = k + sqrt(r^2 - (x-u)^2)
+     */
+    //generate random x cord
+    float randomXSpawn = (rand() % 900);
+    //get random cord and give it a random chance of being negative
+    randomXSpawn =(rand() % 10) < 5 ? randomXSpawn * -1 : randomXSpawn;
+    float randomYSpawn = 0;
+    if(randomXSpawn > 0)
+    {
+		randomYSpawn = (window_x / 2.f) + std::sqrt(pow(window_y, 2) - pow((randomXSpawn - (window_y)),2));
+    }else
+    {
+        //makes it possible to have a negative y cord if x is neg
+        randomYSpawn = (window_x / 2.f) - std::sqrt(pow(window_y, 2) - pow(((randomXSpawn*-1.f) - (window_y)), 2));
+        randomYSpawn *= -1.f;
+    }
+
     std::cout << "x:" << randomXSpawn << " Y:" << randomYSpawn << std::endl;
     this->astroid.setPosition(sf::Vector2f(randomXSpawn, randomYSpawn));
 }
@@ -370,7 +384,7 @@ powerUp::powerUp()
 {
     this->boostObj.setRadius(25);
     this->boostLevel = 1;
-    //TODO: add effect and randomness of boosts
+    //TODO: add effect and randomness of boosts and fix switch first
     /*switch (boostLevel) {
         case (1):
             this->boostObj.setFillColor(sf::Color::Yellow);
@@ -387,15 +401,29 @@ powerUp::~powerUp()
 {
 }
 
-void powerUp::CreatePowerUp()
+void powerUp::CreatePowerUp(const float& window_x, const float& window_y)
 {
-    // TODO: fix spawn algorithm power up
-
-    float randomSpawnX = (rand() % 900) * -1.f;
-    float randomSpawnY = (rand() % 900) * -1.f;
-    // float randomSpawnX = 500;
-    // float randomSpawnY = 500;
-    this->boostObj.setPosition(sf::Vector2f(randomSpawnX, randomSpawnY));
+    /*
+     *function uses equation of a circle by solving for y to spawn powerUps around the screen
+     *y = k + sqrt(r^2 - (x-u)^2)
+     */
+    
+    //generate random x cord
+    float randomXSpawn = (rand() % 900);
+    //get random cord and give it a random chance of being negative
+    randomXSpawn = (rand() % 10) < 5 ? randomXSpawn * -1 : randomXSpawn;
+    float randomYSpawn = 0;
+    if (randomXSpawn > 0)
+    {
+        randomYSpawn = (window_x / 2.f) + std::sqrt(pow(window_y, 2) - pow((randomXSpawn - (window_y)), 2));
+    }
+    else
+    {
+        //makes it possible to have a negative y cord if x is neg
+        randomYSpawn = (window_x / 2.f) - std::sqrt(pow(window_y, 2) - pow(((randomXSpawn * -1.f) - (window_y)), 2));
+        randomYSpawn *= -1.f;
+    }
+    this->boostObj.setPosition(sf::Vector2f(randomXSpawn, randomYSpawn));
 }
 
 void powerUp::move(const float& x, const float& y)

@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <iostream>
 #include <vector>
+#include <complex>
 #include <iostream>
 #include "include/SFML/Graphics/RenderTarget.hpp"
 #include "include/SFML/System/Vector2.hpp"
@@ -22,7 +23,7 @@ public:
 
     void draw(sf::RenderWindow *window);
 
-    void createEnemies(const float& x, const float& y);
+    void createEnemies(const float& window_x, const float& window_y);
 	sf::FloatRect get_bounds();
 	sf::Vector2f get_pos();
 	void move(const float &x,const float &y);
@@ -35,7 +36,7 @@ private:
 public:
 	powerUp();
 	virtual ~powerUp();
-	void CreatePowerUp();
+	void CreatePowerUp(const float& window_x, const float& window_y);
 	void move(const float& x, const float& y);
 	void draw(sf::RenderWindow* window);
 	sf::Vector2f getPos();
