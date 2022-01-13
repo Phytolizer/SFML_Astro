@@ -168,11 +168,11 @@ void Game::make_powerUp(sf::Vector2u size)
             powerUps.erase(powerUps.begin() + i);
             continue;
         }
-        else if (location.x + 901 < 0 - location.x) {
+        else if (location.x + 901 < size.x + location.x) {
             powerUps.erase(powerUps.begin() + i);
             continue;
         }
-        else if (location.y + 901 < 0 - location.y) {
+        else if (location.y + 901 < size.y + location.y) {
             powerUps.erase(powerUps.begin() + i);
             continue;
         }
