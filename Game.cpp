@@ -123,10 +123,10 @@ void Game::make_enemy(sf::Vector2u size)
         }else if (location.y - 901 > size.y - location.y) {
             enemies.erase(enemies.begin() + i);
             continue;
-        }else if (location.x + 901 < 0 - location.x) {
+        }else if (location.x + 901 < size.x + location.x) {
             enemies.erase(enemies.begin() + i);
             continue;
-        }else if (location.y + 901 < 0 - location.y) {
+        }else if (location.y + 901 < size.y + location.y) {
             enemies.erase(enemies.begin() + i);
             continue;
         }
@@ -135,9 +135,9 @@ void Game::make_enemy(sf::Vector2u size)
         float slopeY = size.y / 2.f - location.y;
         float slopeX = size.x / 2.f - location.x;
         float slope = slopeY / slopeX;
-
+        std::cout <<"slope: "<< slope << std::endl;
         //find next point on line, point slope form
-        //curent location 1 is the x cord, loaction 0 is y
+        //curent location 1 is the x cord, location 0 is y
         float nextY = -1 * (slope * ((location.x - 4.f) - location.x)) + location.y;
 
         enemies[i].move(4.f, (nextY - location.y));
@@ -193,7 +193,7 @@ void Game::make_powerUp(sf::Vector2u size)
 }
 
 void Game::Lose() {
-    if (this->player->checkCollision(this->enemies)) {
+    if (this->player->checkCollision(this->enemies,this->powerUps)) {
         lose = true;
     }
 }
@@ -296,8 +296,8 @@ void Player::updateProjectiles(sf::RenderWindow* window)
     }
 }
 
-bool Player::checkCollision(std::vector<Enemy> &enemies) {
-    //check for colllision between the projectiles and astroids
+bool Player::checkCollision(std::vector<Enemy> &enemies, std::vector<powerUp> &powerUp) {
+    //check for collision between the projectiles and asteroids
     for (size_t i = 0; i < projectieles.size(); i++) {
         for (size_t j = 0; enemies.size() > j; j++) {
             if (projectieles[i].getGlobalBounds().intersects(enemies[j].get_bounds())) {
@@ -307,11 +307,18 @@ bool Player::checkCollision(std::vector<Enemy> &enemies) {
             }
         }
     }
-    //checks for inpact of player and astroid
+    //checks for impact of player, asteroid and boost
     for (size_t i = 0; enemies.size() > i; i++) {
         if (enemies[i].get_bounds().intersects(character.getGlobalBounds())) {
             //create a lose function
             return true;
+        }
+    }
+    for(size_t i = 0;powerUp.size() > i;i++)
+    {
+        if (powerUp[i].getBounds().intersects(character.getGlobalBounds()))
+        {
+            powerUp.erase(powerUp.begin() + i);
         }
     }
     return false;
@@ -326,7 +333,7 @@ Enemy::Enemy()
         throw "could not load astroid.png";
     }
 
-    //set astroid texture
+    //set asteroid texture
     this->astroid.setTexture(this->astroidTex);
     this->astroid.scale(0.5f, 0.5f);
 }
@@ -439,6 +446,11 @@ void powerUp::draw(sf::RenderWindow* window)
 sf::Vector2f powerUp::getPos()
 {
     return this->boostObj.getPosition();
+}
+
+sf::FloatRect powerUp::getBounds()
+{
+    return this->boostObj.getGlobalBounds();
 }
 
 

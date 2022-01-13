@@ -40,6 +40,7 @@ public:
 	void move(const float& x, const float& y);
 	void draw(sf::RenderWindow* window);
 	sf::Vector2f getPos();
+	sf::FloatRect getBounds();
 };
 
 
@@ -61,7 +62,7 @@ public:
 	virtual ~Player();
 	void PlayerControl(sf::RenderWindow* window);
 	void updateProjectiles(sf::RenderWindow* window);
-	bool checkCollision(std::vector<Enemy> &enemies);
+	bool checkCollision(std::vector<Enemy> &enemies, std::vector<powerUp>& power);
 };
 
 
