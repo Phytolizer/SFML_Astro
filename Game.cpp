@@ -87,12 +87,6 @@ void Game::render()
         //update projectiles
         player->updateProjectiles(window);
 
-        //TODO: why does it not like to shoot projectiles right when enemies spawn
-        /*
-         * to recreate hold down the fire button while turning and moving
-         * The projectiles are moving but they are behind or not update with the player
-         */
-
         this->make_enemy(window->getSize());
         this->make_powerUp(window->getSize());
     } else {
