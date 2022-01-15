@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <complex>
+#include <list>
 #include <iostream>
 #include "include/SFML/Graphics/RenderTarget.hpp"
 #include "include/SFML/System/Vector2.hpp"
@@ -63,7 +64,7 @@ public:
 	virtual ~Player();
 	void PlayerControl(sf::RenderWindow* window);
 	void updateProjectiles(sf::RenderWindow* window);
-	bool checkCollision(std::vector<Enemy> &enemies, std::vector<powerUp>& power);
+	bool checkCollision(std::list<Enemy> &enemies, std::vector<powerUp> &powerUp);
 };
 
 
@@ -75,7 +76,7 @@ private:
 
 	// collides
 	Player* player;
-	std::vector<Enemy> enemies;
+	std::list<Enemy> enemies;
 	std::vector<powerUp> powerUps;
 	//private functions
 	void initializeVariables();

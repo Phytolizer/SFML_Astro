@@ -18,7 +18,7 @@ void Game::initializeVariables() {
 void Game::initWindow()
 {
     this->window = new sf::RenderWindow(sf::VideoMode(900, 900), "Game 1", sf::Style::Default);
-    this->window->setMouseCursorGrabbed(true);
+    this->window->setMouseCursorGrabbed(false);
 
     this->window->setFramerateLimit(60);
 }
@@ -103,25 +103,26 @@ void Game::make_enemy(sf::Vector2u size)
     //TODO: make so enemies ups that spawn on the positive x side of the screen move across the screen
 
     if(frameCounter >= 80) {
-        enemies.push_back(Enemy());
-        enemies.back().createEnemies(window->getSize().x,window->getSize().y);
+        Enemy enemy;
+        enemy.createEnemies(window->getSize().x, window->getSize().y);
+        enemies.emplace_back(std::move(enemy));
         frameCounter = 0;
     }
-    for (size_t i = 0; i < enemies.size(); i++) {
+    for (auto it = enemies.begin(); it != enemies.end(); ) {
         //get location
-        const sf::Vector2f location = this->enemies[i].get_pos();
+        const sf::Vector2f location = it->get_pos();
 
         if (location.x - 901 > size.x - location.x) {
-            enemies.erase(enemies.begin() + i);
+            it = enemies.erase(it);
             continue;
         }else if (location.y - 901 > size.y - location.y) {
-            enemies.erase(enemies.begin() + i);
+            it = enemies.erase(it);
             continue;
         }else if (location.x + 901 < size.x + location.x) {
-            enemies.erase(enemies.begin() + i);
+            it = enemies.erase(it);
             continue;
         }else if (location.y + 901 < size.y + location.y) {
-            enemies.erase(enemies.begin() + i);
+            it = enemies.erase(it);
             continue;
         }
         //find the slope
@@ -129,13 +130,14 @@ void Game::make_enemy(sf::Vector2u size)
         float slopeY = size.y / 2.f - location.y;
         float slopeX = size.x / 2.f - location.x;
         float slope = slopeY / slopeX;
-        std::cout <<"slope: "<< slope << std::endl;
+        std::cout << "slope: " << slope << std::endl;
         //find next point on line, point slope form
         //curent location 1 is the x cord, location 0 is y
         float nextY = -1 * (slope * ((location.x - 4.f) - location.x)) + location.y;
 
-        enemies[i].move(4.f, (nextY - location.y));
-        enemies[i].draw(this->window);
+        it->move(4.f, (nextY - location.y));
+        it->draw(this->window);
+        ++it;
     }
 
 }
@@ -286,20 +288,20 @@ void Player::updateProjectiles(sf::RenderWindow* window)
     }
 }
 
-bool Player::checkCollision(std::vector<Enemy> &enemies, std::vector<powerUp> &powerUp) {
+bool Player::checkCollision(std::list<Enemy> &enemies, std::vector<powerUp> &powerUp) {
     //check for collision between the projectiles and asteroids
     for (size_t i = 0; i < projectiles.size(); i++) {
-        for (size_t j = 0; enemies.size() > j; j++) {
-            if (projectiles[i].shape.getGlobalBounds().intersects(enemies[j].get_bounds())) {
+        for (auto it = enemies.begin(); it != enemies.end(); ++it) {
+            if (projectiles[i].shape.getGlobalBounds().intersects(it->get_bounds())) {
                 projectiles.erase(projectiles.begin() + i);
-                enemies.erase(enemies.begin() + j);
+                it = enemies.erase(it);
                 break;//we have to break out bc it will check a projectile that no longer igists if we stay in loop
             }
         }
     }
     //checks for impact of player, asteroid and boost
-    for (size_t i = 0; enemies.size() > i; i++) {
-        if (enemies[i].get_bounds().intersects(character.getGlobalBounds())) {
+    for (auto it = enemies.begin(); it != enemies.end(); ++it) {
+        if (it->get_bounds().intersects(character.getGlobalBounds())) {
             //create a lose function
             return true;
         }
@@ -368,9 +370,9 @@ sf::Vector2f Enemy::get_pos()
 }
 void Enemy::draw(sf::RenderWindow* window)
 {
-    //TODO: why do i have to set texture hear
-    this->astroid.setTexture(this->astroidTex);
-    window->draw(this->astroid);
+    // TODO: why do i have to set texture hear
+    astroid.setTexture(astroidTex);
+    window->draw(astroid);
 }
 void Enemy::move(const float& x, const float& y)
 {
