@@ -265,9 +265,8 @@ void Player::shootProjectiles(const float& angle, sf::RenderWindow* window)
     //find slope for projectile to follow
     float moveY = (mousePos.y - playerPos.y);
     float moveX = (mousePos.x - playerPos.x);
-    projectieles.push_back(projectile);
-    projectielePathX.push_back(moveX);
-    projectielePathY.push_back(moveY);
+	sf::Vector2f velocity = sf::Vector2f(moveX, moveY);
+    projectiles.push_back(Projectile{this->projectile, velocity});
 }
 
 void Player::updateProjectiles(sf::RenderWindow* window)
@@ -278,30 +277,27 @@ void Player::updateProjectiles(sf::RenderWindow* window)
     delete out of range projectiles
 
     */
-    for (size_t i = 0; i < projectieles.size(); i++) {
-        if (projectieles[i].getPosition().x < 0 || projectieles[i].getPosition().x > window->getSize().x) {
-            projectieles.erase(projectieles.begin() + i);
-            projectielePathX.erase(projectielePathX.begin() + i);
-            projectielePathY.erase(projectielePathY.begin() + i);
-            continue;
-        } else if (projectieles[i].getPosition().y < 0 || projectieles[i].getPosition().y > window->getSize().y) {
-            projectieles.erase(projectieles.begin() + i);
-            projectielePathX.erase(projectielePathX.begin() + i);
-            projectielePathY.erase(projectielePathY.begin() + i);
-            continue;
-        } else {
-            projectieles[i].move(projectielePathX[i] / 10, projectielePathY[i] / 10);
-            window->draw(projectieles[i]);
+    for (size_t i = 0; i < projectiles.size(); i++) {
+        if (projectiles[i].shape.getPosition().x < 0 || projectiles[i].shape.getPosition().x > window->getSize().x ||
+            projectiles[i].shape.getPosition().y < 0 || projectiles[i].shape.getPosition().y > window->getSize().y)
+        {
+            projectiles.erase(projectiles.begin() + i);
+            --i;
+        }
+        else
+        {
+            projectiles[i].shape.move(projectiles[i].velocity.x / 10, projectiles[i].velocity.y / 10);
+            window->draw(projectiles[i].shape);
         }
     }
 }
 
 bool Player::checkCollision(std::vector<Enemy> &enemies, std::vector<powerUp> &powerUp) {
     //check for collision between the projectiles and asteroids
-    for (size_t i = 0; i < projectieles.size(); i++) {
+    for (size_t i = 0; i < projectiles.size(); i++) {
         for (size_t j = 0; enemies.size() > j; j++) {
-            if (projectieles[i].getGlobalBounds().intersects(enemies[j].get_bounds())) {
-                projectieles.erase(projectieles.begin() + i);
+            if (projectiles[i].shape.getGlobalBounds().intersects(enemies[j].get_bounds())) {
+                projectiles.erase(projectiles.begin() + i);
                 enemies.erase(enemies.begin() + j);
                 break;//we have to break out bc it will check a projectile that no longer igists if we stay in loop
             }

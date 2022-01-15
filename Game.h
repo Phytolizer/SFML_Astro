@@ -43,17 +43,18 @@ public:
 	sf::FloatRect getBounds();
 };
 
-
+struct Projectile {
+	sf::RectangleShape shape;
+	sf::Vector2f velocity;
+};
 
 class Player {
 private:
 	sf::Texture playerTex;
 	//projectiles
 	sf::RectangleShape projectile;
-	std::vector<float> projectielePathX;
-	std::vector<float> projectielePathY;
+	std::vector<Projectile> projectiles;
 	void shootProjectiles(const float& angle, sf::RenderWindow* window);
-	std::vector<sf::RectangleShape> projectieles;
 	sf::Sprite character;
 	size_t frameCounter;
 
