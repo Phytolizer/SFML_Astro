@@ -376,16 +376,20 @@ powerUp::powerUp()
     this->boostObj.setRadius(25);
     this->boostLevel = 1;
     //TODO: add effect and randomness of boosts and fix switch first
-    /*switch (boostLevel) {
-        case (1):
-            this->boostObj.setFillColor(sf::Color::Yellow);
-        case 2:
-            this->boostObj.setFillColor(sf::Color::Cyan);
-        case 3:
-            this->boostObj.setFillColor(sf::Color::Green);
-        default:
-            throw "error in assigning color to the power up";
-    }*/
+    switch (boostLevel) {
+		case 1:
+			this->boostObj.setFillColor(sf::Color::Yellow);
+			break;
+		case 2:
+			this->boostObj.setFillColor(sf::Color::Cyan);
+			break;
+		case 3:
+			this->boostObj.setFillColor(sf::Color::Green);
+			break;
+		default:
+			throw "error in assigning color to the power up";
+			break;
+    }
 }
 
 void powerUp::CreatePowerUp(const float& window_x, const float& window_y)
