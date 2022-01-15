@@ -213,10 +213,6 @@ Player::Player(sf::Vector2u size)
     frameCounter = 0;
 }
 
-Player::~Player()
-{
-}
-
 void Player::PlayerControl(sf::RenderWindow* window) {
 
     //rotate to face mouse
@@ -330,10 +326,6 @@ Enemy::Enemy()
     this->astroid.scale(0.5f, 0.5f);
 }
 
-Enemy::~Enemy()
-{
-}
-
 void Enemy::createEnemies(const float& window_x, const float& window_y)
 {
     /*
@@ -394,10 +386,6 @@ powerUp::powerUp()
         default:
             throw "error in assigning color to the power up";
     }*/
-}
-
-powerUp::~powerUp()
-{
 }
 
 void powerUp::CreatePowerUp(const float& window_x, const float& window_y)

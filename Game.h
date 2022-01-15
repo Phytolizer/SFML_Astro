@@ -20,8 +20,6 @@ private:
 public:
     Enemy();
 
-    virtual ~Enemy();
-
     void draw(sf::RenderWindow *window);
 
     void createEnemies(const float& window_x, const float& window_y);
@@ -36,7 +34,6 @@ private:
 	unsigned int boostLevel;
 public:
 	powerUp();
-	virtual ~powerUp();
 	void CreatePowerUp(const float& window_x, const float& window_y);
 	void move(const float& x, const float& y);
 	void draw(sf::RenderWindow* window);
@@ -61,7 +58,6 @@ private:
 
 public:
 	Player(sf::Vector2u size);
-	virtual ~Player();
 	void PlayerControl(sf::RenderWindow* window);
 	void updateProjectiles(sf::RenderWindow* window);
 	bool checkCollision(std::list<Enemy> &enemies, std::vector<powerUp> &powerUp);
@@ -91,7 +87,7 @@ private:
 public:
 	//constructors / destructors
 	Game();
-	virtual ~Game();
+	~Game();
 	//accessor
 	const bool getWindowIsOpen();
 	//functions
